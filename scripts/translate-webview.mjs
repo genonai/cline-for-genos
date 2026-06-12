@@ -15,6 +15,10 @@ if (!dictPath || !targetDir) {
 	console.error("usage: translate-webview.mjs --dict <ko.json> --target <webview build dir>")
 	process.exit(1)
 }
+if (!fs.existsSync(targetDir) || !fs.statSync(targetDir).isDirectory()) {
+	console.error(`[i18n] error: target not found or not a directory: ${targetDir}`)
+	process.exit(1)
+}
 
 const dict = JSON.parse(fs.readFileSync(dictPath, "utf8"))
 const files = []
@@ -37,7 +41,8 @@ for (const f of files) {
 		for (const [from, to] of variants) {
 			if (src.includes(from)) {
 				counts[en] += src.split(from).length - 1
-				src = src.replaceAll(from, to)
+				// 함수 인자: 문자열 둘째 인자는 $& 등 치환 패턴이 해석되는 JS 함정 방어
+				src = src.replaceAll(from, () => to)
 			}
 		}
 	}
