@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-UPSTREAM_TAG="$(cat UPSTREAM_VERSION)"
+UPSTREAM_TAG="$(tr -d '[:space:]' < UPSTREAM_VERSION)"
 GENOS_VERSION="${UPSTREAM_TAG#v}"
 BUILD_DIR="$ROOT/build/upstream"
 EXT_DIR="$BUILD_DIR/apps/vscode"
@@ -25,13 +25,38 @@ for p in "$ROOT"/patches/*.patch; do
 done
 shopt -u nullglob
 
+# 2.5 브랜딩 (jq 필드 단위 편집 — 통파일 overlay 금지: upstream 의존성/contributes 추적 유지)
+PKG="$EXT_DIR/package.json"
+tmp="$(mktemp)"
+jq '
+  .name = "cline-for-genos"
+  | .displayName = "CLINE-for-Genos"
+  | .publisher = "genon"
+  | .author = {name: "CLINE-for-Genos"}
+  | .repository.url = "https://github.com/mindsandcompany/cline-for-genos"
+  | .homepage = "https://genon.ai/"
+  | .contributes.commands |= map(select(.command != "cline.accountButtonClicked"))
+  | (if .contributes.menus["view/title"] then
+       .contributes.menus["view/title"] |= map(select(.command != "cline.accountButtonClicked"))
+     else . end)
+' "$PKG" > "$tmp" && mv "$tmp" "$PKG"
+
+# walkthrough 문구 브랜딩
+if [ -d "$EXT_DIR/walkthrough" ]; then
+  find "$EXT_DIR/walkthrough" -name '*.md' -exec sed -i.bak 's/\bCline\b/CLINE-for-Genos/g' {} \;
+  find "$EXT_DIR/walkthrough" -name '*.bak' -delete
+fi
+
+# README overlay
+cp "$ROOT/overlay/README.md" "$EXT_DIR/README.md"
+
 # 3. 의존성 설치
 npm --prefix "$EXT_DIR" ci --include=optional
 npm --prefix "$EXT_DIR/webview-ui" ci --include=optional
 
 # 4. 패키징 (vscode:prepublish 체인이 protos→webview 빌드→esbuild 전부 수행)
 mkdir -p "$ROOT/dist"
-(cd "$EXT_DIR" && npx vsce package --allow-package-secrets sendgrid \
+(cd "$EXT_DIR" && ./node_modules/.bin/vsce package --allow-package-secrets sendgrid \
   --out "$ROOT/dist/cline-for-genos-$GENOS_VERSION.vsix")
 
 echo "[build] done: dist/cline-for-genos-$GENOS_VERSION.vsix"
