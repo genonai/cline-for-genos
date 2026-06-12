@@ -33,7 +33,7 @@ jq '
   | .displayName = "CLINE-for-Genos"
   | .publisher = "genon"
   | .author = {name: "CLINE-for-Genos"}
-  | .repository.url = "https://github.com/mindsandcompany/cline-for-genos"
+  | .repository.url = "https://github.com/genonai/cline-for-genos"
   | .homepage = "https://genon.ai/"
   | .contributes.commands |= map(select(.command != "cline.accountButtonClicked"))
   | (if .contributes.menus["view/title"] then

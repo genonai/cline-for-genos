@@ -29,7 +29,7 @@ CI(`.github/workflows/build.yml`)가 push마다 동일 절차를 수행한다 (u
 3. 빌드 로그의 `[i18n] unmatched` 항목 → upstream 소스에서 현행 영문 찾아 `i18n/ko.json` 키 교체 (LLM 일괄 번역 가능)
 4. `check-forbidden-strings.sh` 통과 확인
 5. UI smoke: 사이드바 브랜딩·한국어 라벨·webview 콘솔 무에러·채팅 1회
-6. `gh release create v<ver>-genos.1 dist/*.vsix --repo genonai/cline-for-genos` → GenOS `Dockerfile-codespace-*`의 `CLINE_GENOS_RELEASE`/`CLINE_GENOS_VSIX` ARG 갱신 + `cline-cli` 스테이지의 `@cline/cli-linux-*` 버전 갱신
+6. `gh release create v<ver>-genos.1 dist/cline-for-genos-<ver>.vsix --repo genonai/cline-for-genos` → GenOS `Dockerfile-codespace-*`의 `CLINE_GENOS_RELEASE`/`CLINE_GENOS_VSIX` ARG 갱신 + `cline-cli` 스테이지의 `@cline/cli-linux-*` 버전 갱신
 7. 구조 변화 감지 포인트: webview vite outDir(`build.sh`의 WEBVIEW_OUT), 설정 파일 키(upstream `apps/vscode/src/shared/storage/state-keys.ts`), endpoints.json 스키마(`apps/vscode/src/config.ts`)
 
 ## 레거시

@@ -8,10 +8,10 @@
 <table>
 <tbody>
 <td align="center">
-<a href="https://github.com/mindsandcompany/cline-for-genos/releases" target="_blank"><strong>Download VSIX (Releases)</strong></a>
+<a href="https://github.com/genonai/cline-for-genos/releases" target="_blank"><strong>Download VSIX (Releases)</strong></a>
 </td>
 <td align="center">
-<a href="https://github.com/mindsandcompany/cline-for-genos/issues" target="_blank"><strong>Issues</strong></a>
+<a href="https://github.com/genonai/cline-for-genos/issues" target="_blank"><strong>Issues</strong></a>
 </td>
 </tbody>
 </table>
