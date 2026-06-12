@@ -1,0 +1,21 @@
+name: build
+on:
+  push:
+    branches: [v2-build-repo, main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test test/translate.test.mjs
+      - run: bash scripts/build.sh
+      - run: bash scripts/check-forbidden-strings.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: dist/*.vsix
