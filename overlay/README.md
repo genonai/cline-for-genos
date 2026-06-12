@@ -29,9 +29,6 @@ Thanks to [Claude Sonnet's agentic coding capabilities](https://www.anthropic.co
     - For web development tasks, CLINE-for-Genos can launch the site in a headless browser, click, type, scroll, and capture screenshots + console logs, allowing him to fix runtime errors and visual bugs.
 4. When a task is completed, CLINE-for-Genos will present the result to you with a terminal command like `open -a "Google Chrome" index.html`, which you run with a click of a button.
 
-> [!TIP]
-> Follow [this guide](https://docs.cline.bot/features/customization/opening-cline-in-sidebar) to open CLINE-for-Genos on the right side of your editor. This lets you use CLINE-for-Genos side-by-side with your file explorer, and see how he changes your workspace more clearly.
-
 ---
 
 <img align="right" width="340" src="https://github.com/user-attachments/assets/3cf21e04-7ce9-4d22-a7b9-ba2c595e88a4">

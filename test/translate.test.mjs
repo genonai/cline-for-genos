@@ -1,6 +1,6 @@
 import { test } from "node:test"
 import assert from "node:assert"
-import { execFileSync } from "node:child_process"
+import { spawnSync } from "node:child_process"
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
@@ -18,7 +18,7 @@ test("사전 항목을 번들에서 완전 일치 치환하고, 부분 일치는
 		JSON.stringify({ "Read project files": "프로젝트 파일 읽기", "Never appears": "없음" }),
 	)
 
-	const stdout = execFileSync("node", ["scripts/translate-webview.mjs", "--dict", dict, "--target", tmp], {
+	const res = spawnSync("node", ["scripts/translate-webview.mjs", "--dict", dict, "--target", tmp], {
 		encoding: "utf8",
 	})
 
@@ -27,5 +27,7 @@ test("사전 항목을 번들에서 완전 일치 치환하고, 부분 일치는
 	assert.match(result, /'프로젝트 파일 읽기'/)
 	assert.doesNotMatch(result, /Read project files/)
 	assert.match(result, /ReadProjectFilesKey/)
-	assert.match(stdout, /1\/2 entries replaced/)
+	assert.match(res.stdout, /1\/2 entries replaced/)
+	assert.match(res.stderr, /unmatched/)
+	assert.match(res.stderr, /Never appears/)
 })

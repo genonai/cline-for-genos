@@ -60,9 +60,12 @@ echo "[build] vite outDir hint: ${OUTDIR_LINE:-not-found (default dist)}"
 WEBVIEW_OUT="build"   # v3.89.2 기준. 위 hint와 다르면 이 값을 수정할 것.
 
 # 5. 패키징: prepublish 체인 끝에 i18n 치환을 끼워 단일 vsce 호출로 완결
+# i18n 도구를 빌드 트리 내 확장 디렉터리 밖에 복사 (vsix에 미포함 + 절대경로 미노출)
+mkdir -p "$BUILD_DIR/apps/genos-i18n"
+cp "$ROOT/scripts/translate-webview.mjs" "$ROOT/i18n/ko.json" "$BUILD_DIR/apps/genos-i18n/"
 mkdir -p "$ROOT/dist"
 (cd "$EXT_DIR" && \
-  npm pkg set "scripts.vscode:prepublish=npm run package && node $ROOT/scripts/translate-webview.mjs --dict $ROOT/i18n/ko.json --target ./webview-ui/$WEBVIEW_OUT" && \
+  npm pkg set "scripts.vscode:prepublish=npm run package && node ../genos-i18n/translate-webview.mjs --dict ../genos-i18n/ko.json --target ./webview-ui/$WEBVIEW_OUT" && \
   ./node_modules/.bin/vsce package --allow-package-secrets sendgrid \
     --out "$ROOT/dist/cline-for-genos-$GENOS_VERSION.vsix")
 
