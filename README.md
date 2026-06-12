@@ -30,7 +30,9 @@ CI(`.github/workflows/build.yml`)가 push마다 동일 절차를 수행한다 (u
 4. `check-forbidden-strings.sh` 통과 확인
 5. UI smoke: 사이드바 브랜딩·한국어 라벨·webview 콘솔 무에러·채팅 1회
 6. `gh release create v<ver>-genos.1 dist/cline-for-genos-<ver>.vsix --repo genonai/cline-for-genos` → GenOS `Dockerfile-codespace-*`의 `CLINE_GENOS_RELEASE`/`CLINE_GENOS_VSIX` ARG 갱신 + `cline-cli` 스테이지의 `@cline/cli-linux-*` 버전 갱신
-7. 구조 변화 감지 포인트: webview vite outDir(`build.sh`의 WEBVIEW_OUT), 설정 파일 키(upstream `apps/vscode/src/shared/storage/state-keys.ts`), endpoints.json 스키마(`apps/vscode/src/config.ts`)
+7. 구조 변화 감지 포인트: webview vite outDir(`build.sh`의 WEBVIEW_OUT), 설정 파일 키(upstream `apps/vscode/src/shared/storage/state-keys.ts`), endpoints.json 스키마(`apps/vscode/src/config.ts`), 명령·뷰 ID 프리픽스 파생식(`name === "claude-dev" ? "cline" : name` — dist 번들에서 grep)
+
+> ⚠️ **브랜딩은 반드시 빌드 후**: esbuild가 package.json name/publisher를 번들에 인라인하고 런타임 명령·뷰 ID를 name에서 파생한다. 빌드 전에 name을 바꾸면 사이드바 webview가 영원히 빈 화면이 된다 (`build.sh` 상단 주석 참고). 갱신 후 vsix 설치 스모크에서 **사이드바 패널 본문이 채팅 UI로 그려지는지** 반드시 확인할 것.
 
 ## 레거시
 
