@@ -6,16 +6,26 @@
 
 ---
 
-## 0. 사전 준비
+## 0. 사전 준비 — 검증 환경 2종
 
-### 로컬 단독 검증 (docker)
+### A. 배포 코드스페이스 (운영/검증계 — **QA 기본 환경**)
+
+GenOS에서 코드스페이스를 생성하고 평소처럼 접속한다 (docker 명령 불필요·불가).
+
+> **현재 배포에는 서빙 env 자동 주입이 없다** (후속 이슈 #13294, admin-api/FE 연동 전).
+> 따라서 배포 환경의 기본 사용 흐름은 **시나리오 2-A(설정 UI 수동 입력)** — v1과 동일한 사용자 경험이다.
+> 시나리오 2-B(자동 설정)는 로컬 docker 검증 전용이며, #13294 적용 후 운영 기본 경로가 된다.
+
+### B. 로컬 docker 단독 검증 (개발자 사전 검증 전용)
+
+운영 접속 경로(nginx→user_proxy)는 GenOS 세션에 결합되어 있어, 로컬에서는 검증용 code-server를 외부 바인드로 추가 기동한다. **이 절차는 로컬 전용** — 배포 코드스페이스에서는 수행할 수 없고 할 필요도 없다.
 
 ```bash
 # 이미지 빌드 (GenOS 레포 task/13261 체크아웃 기준)
 cd container-services/codespace
 docker build -f Dockerfile-codespace-slim -t codespace-slim:qa .
 
-# 서빙 자동 설정 모드로 기동 (검증용 code-server를 외부 바인드로 추가 기동)
+# env 자동 설정 모드 검증용 기동 (시나리오 2-B) — env 3종을 빼면 수동 설정 모드(2-A) 검증
 docker run -d --name cs-qa -p 18084:8081 \
   -e JUPYTER_ENDPOINT=/jupyter \
   -e GENOS_SERVING_URL="{GenOS주소}/api/gateway/rep/serving/{서빙번호}/v1" \
@@ -26,9 +36,7 @@ docker exec -d cs-qa code-server --bind-addr 0.0.0.0:8081 --auth none /workspace
 # 브라우저: http://localhost:18084  (트러스트 다이얼로그가 뜨면 "Yes, I trust the authors")
 ```
 
-배포 환경(코드스페이스)에서는 평소처럼 접속하면 된다. env 미주입 환경은 시나리오 2-B로 검증.
-
-### 환경변수 계약 (provisioning)
+### 환경변수 계약 (provisioning — 컨테이너 기동 시 1회 시딩)
 
 | 변수 | 필수 | 효과 |
 |---|---|---|
@@ -36,6 +44,8 @@ docker exec -d cs-qa code-server --bind-addr 0.0.0.0:8081 --auth none /workspace
 | `GENOS_SERVING_API_KEY` | 〃 | API Key 사전 설정 (secrets.json 0600) |
 | `GENOS_SERVING_MODEL_ID` | 선택 | 모델 ID 사전 설정 |
 | `GENOS_CLINE_NTC=false` | 선택 | native tool calling 비활성 (문제 시 우회용) |
+
+env 유무와 무관하게 폐쇄망 kill-switch(`~/.cline/endpoints.json`)와 텔레메트리 OFF는 항상 시딩된다.
 
 ---
 
@@ -54,22 +64,40 @@ docker exec -d cs-qa code-server --bind-addr 0.0.0.0:8081 --auth none /workspace
 | 1-5 | 히스토리(⏱) 버튼 클릭 | 히스토리 뷰 전환 — **"command not found" 에러 토스트가 뜨면 결함** | ☐ |
 | 1-6 | 확장 목록(Extensions 패널) | `CLINE-for-Genos` (publisher genon) v3.89.2 | ☐ |
 
-## 시나리오 2 — 서빙 설정 사전 주입 (provisioning)
+## 시나리오 2 — 서빙 연결 설정
 
-**A. env 주입 환경:**
+### 2-A. 설정 UI 수동 입력 — **현행 배포 기본 경로 (v1과 동일한 사용자 흐름)**
+
+env 미주입 환경(현재 운영 코드스페이스 전부)에서 패널을 열면 웰컴 화면이 나온다:
+
+![웰컴 — 수동 설정 진입](05-welcome-manual-setup.png)
+
+절차: **"Use your own API key"** 클릭 → API Provider 입력란에 `openai` 타이핑(검색형 콤보박스) → **"OpenAI Compatible"** 선택 → 3개 필드 입력 → **"Let's go!"**
+
+![Provider 검색](06-provider-search.png)
+
+| 필드 | 입력 값 |
+|---|---|
+| Base URL | `{GenOS 접속주소}/api/gateway/rep/serving/{서빙번호}/v1` |
+| OpenAI Compatible API Key | GenOS 서빙 API 키 |
+| Model ID | 서빙 모델 ID (라우터형 서빙은 `/v1/models` 응답의 `id` 값) |
+
+![입력 완료 예시](07-manual-form-filled.png)
 
 | # | 확인 항목 | 기대 결과 | 확인 |
 |---|---|---|---|
-| 2-1 | 패널 첫 화면 | 가입/로그인 권유 **웰컴이 아니라** 바로 채팅 화면 ("What can I do for you?") | ☐ |
-| 2-2 | 입력창 하단 모델 배지 | `openai-compat:{모델ID}` (이미지 1 좌하단 참조) | ☐ |
-| 2-3 | 설정(⚙) → API Configuration | Provider=OpenAI Compatible, Base URL·Key·Model 사전 입력 | ☐ |
-| 2-4 | 설정을 임의 변경 후 컨테이너 재기동 | (홈 영속 환경 한정) 변경값 보존 — 시딩이 덮어쓰지 않음 | ☐ |
+| 2-1 | Provider 검색 | `openai` 타이핑 시 "OpenAI Compatible" 필터링·선택 가능 | ☐ |
+| 2-2 | Let's go! 클릭 | 웰컴이 닫히고 채팅 화면 전환, 입력창 하단에 `openai-compat:{모델ID}` 배지 | ☐ |
+| 2-3 | 설정 영속 | 코드스페이스 터미널에서 `cat ~/.cline/data/globalState.json` → `openAiBaseUrl` 기록 확인, `stat -c %a ~/.cline/data/secrets.json` → `600` | ☐ |
+| 2-4 | (홈 영속 환경) 재접속 | 재설정 없이 그대로 사용 가능 | ☐ |
 
-**B. env 미주입 환경(기존 동작 회귀):**
+### 2-B. env 자동 주입 (로컬 docker 검증 전용 — #13294 적용 후 운영 기본)
 
 | # | 확인 항목 | 기대 결과 | 확인 |
 |---|---|---|---|
-| 2-5 | 패널 첫 화면 | 웰컴 화면 표시 → "자신의 API 키 사용" 경로로 수동 설정 가능 (v1과 동일) | ☐ |
+| 2-5 | 패널 첫 화면 | 웰컴 **없이** 바로 채팅 화면 + 모델 배지 (이미지 1 좌하단) | ☐ |
+| 2-6 | 설정(⚙) → API Configuration | Base URL·Key·Model 사전 입력 상태 | ☐ |
+| 2-7 | 설정을 임의 변경 후 컨테이너 재기동 | 변경값 보존 — 시딩이 기존 파일을 덮어쓰지 않음 | ☐ |
 
 ## 시나리오 3 — 한국어 UI (자동승인 메뉴)
 
