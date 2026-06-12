@@ -2,8 +2,9 @@
 # 빌드 산출물 vsix의 브랜딩·차단 항목 검증 (Kilo Code forbidden-strings 패턴 축소판)
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-VSIX="$(ls "$ROOT"/dist/*.vsix | head -1)"
+VSIX="$(ls -t "$ROOT"/dist/*.vsix | head -1)"
 tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
 unzip -q "$VSIX" -d "$tmp"
 PKG="$tmp/extension/package.json"
 fail=0
