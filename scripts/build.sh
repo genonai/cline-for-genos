@@ -41,10 +41,9 @@ jq '
      else . end)
 ' "$PKG" > "$tmp" && mv "$tmp" "$PKG"
 
-# walkthrough 문구 브랜딩
+# walkthrough 문구 브랜딩 (perl: BSD/GNU 양쪽에서 \b word-boundary 동작)
 if [ -d "$EXT_DIR/walkthrough" ]; then
-  find "$EXT_DIR/walkthrough" -name '*.md' -exec sed -i.bak 's/\bCline\b/CLINE-for-Genos/g' {} \;
-  find "$EXT_DIR/walkthrough" -name '*.bak' -delete
+  find "$EXT_DIR/walkthrough" -name '*.md' -exec perl -pi -e 's/\bCline\b/CLINE-for-Genos/g' {} \;
 fi
 
 # README overlay
