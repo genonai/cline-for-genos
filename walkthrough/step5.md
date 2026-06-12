@@ -1,7 +1,0 @@
-# No Black Box: Full Visibility & Control
-
-**CLINE-for-Genos operates with complete transparency, showing you every file read and every proposed diff.**
-
-Understand exactly what CLINE-for-Genos is doing and why—no obfuscation. Review all actions and approve changes before they're made. CLINE-for-Genos uses checkpoints, allowing you to easily revert if needed, maintaining full control over your codebase. With BYO-key, you also have clear cost transparency.
-
-![CLINE-for-Genos Transparency Demo](https://storage.googleapis.com/cline_public_images/docs/assets/clines-transparency-hifi-5_compress.webp)
