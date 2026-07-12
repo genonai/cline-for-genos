@@ -1,0 +1,52 @@
+name: release
+# 릴리스 태그(vX.Y.Z-genos.N) push 시 vsix 빌드 + 상표 게이트 통과 후 GitHub Release 자동 발행.
+# GenOS 코드스페이스 이미지(Dockerfile-codespace-*)가 이 Release 에서 vsix 를 내려받는다
+#   (ARG CLINE_GENOS_RELEASE=vX.Y.Z-genos.N). → 소스=여기, 배포 아티팩트=Release, 소비=GenOS.
+on:
+  push:
+    tags:
+      - "v*-genos.*"
+
+permissions:
+  contents: write # Release 생성 권한
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # 태그의 upstream 부분이 UPSTREAM_VERSION 과 일치하는지 가드.
+      # (build.sh 는 UPSTREAM_VERSION 을 clone 하므로, 태그만 올리고 버전 파일을 안 맞추면
+      #  엉뚱한 upstream 의 vsix 가 태그명과 불일치로 발행되는 사고를 막는다.)
+      - name: Verify tag matches UPSTREAM_VERSION
+        run: |
+          TAG_UPSTREAM="${GITHUB_REF_NAME%-genos.*}"
+          FILE_UPSTREAM="$(tr -d '[:space:]' < UPSTREAM_VERSION)"
+          echo "tag=${GITHUB_REF_NAME} tag_upstream=${TAG_UPSTREAM} file_upstream=${FILE_UPSTREAM}"
+          if [ "$TAG_UPSTREAM" != "$FILE_UPSTREAM" ]; then
+            echo "::error::태그 upstream(${TAG_UPSTREAM}) != UPSTREAM_VERSION(${FILE_UPSTREAM}). UPSTREAM_VERSION 을 먼저 맞춰 커밋/태깅하세요."
+            exit 1
+          fi
+
+      # build.yml 과 동일한 검증·빌드·게이트 체인 (릴리스도 같은 관문 통과)
+      - name: Translate test
+        run: node --test test/translate.test.mjs
+      - name: Build vsix
+        run: bash scripts/build.sh
+      - name: Trademark gate (상표 게이트)
+        run: bash scripts/check-forbidden-strings.sh
+
+      # 내장 gh CLI 로 Release 발행 (third-party action 미사용 — 공급망 노출 최소화)
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VSIX="$(ls -t dist/*.vsix | head -1)"
+          echo "publishing ${VSIX} as release ${GITHUB_REF_NAME}"
+          gh release create "${GITHUB_REF_NAME}" "${VSIX}" \
+            --title "cline-for-genos ${GITHUB_REF_NAME}" \
+            --generate-notes

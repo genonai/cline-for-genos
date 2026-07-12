@@ -1,0 +1,14 @@
+GenCode
+Copyright (c) GenOn AI
+
+This product is a rebranded distribution based on Cline
+(https://github.com/cline/cline), Copyright (c) Cline Bot Inc.,
+licensed under the Apache License, Version 2.0.
+
+The full Apache-2.0 license text is retained in LICENSE.txt.
+"Cline" is a trademark of Cline Bot Inc.; it is used here only to
+attribute the origin of the underlying source, not to identify this
+product. This product is not affiliated with or endorsed by Cline Bot Inc.
+
+Modifications by GenOn AI: GenOS branding, Korean localization,
+closed-network provisioning, GenOS serving auto-connect.

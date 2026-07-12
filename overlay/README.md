@@ -1,8 +1,6 @@
-# CLINE-for-Genos
+# GenCode
 
-<p align="center">
-  <img src="https://media.githubusercontent.com/media/cline/cline/main/assets/docs/demo.gif" width="100%" />
-</p>
+GenOS 코딩 에이전트 — 폐쇄망(온프렘) 환경에서 GenOS 서빙에 연결해 동작하는 VS Code 확장.
 
 <div align="center">
 <table>
@@ -17,110 +15,23 @@
 </table>
 </div>
 
-Meet CLINE-for-Genos, an AI assistant that can use your **CLI** a**N**d **E**ditor.
+GenCode 는 계획(Plan)·실행(Act) 에이전트 루프로 소프트웨어 개발 작업을 단계별로 처리합니다. 파일 생성·편집, 대형 프로젝트 탐색(AST·정규식 검색·파일 읽기), 터미널 실행(승인 후), Model Context Protocol(MCP) 툴 확장을 지원하며, 모든 파일 변경·터미널 명령을 사용자가 승인하는 human-in-the-loop GUI 를 제공합니다.
 
-Thanks to [Claude Sonnet's agentic coding capabilities](https://www.anthropic.com/claude/sonnet), CLINE-for-Genos can handle complex software development tasks step-by-step. With tools that let him create & edit files, explore large projects, use the browser, and execute terminal commands (after you grant permission), he can assist you in ways that go beyond code completion or tech support. CLINE-for-Genos can even use the Model Context Protocol (MCP) to create new tools and extend his own capabilities. While autonomous AI scripts traditionally run in sandboxed environments, this extension provides a human-in-the-loop GUI to approve every file change and terminal command, providing a safe and accessible way to explore the potential of agentic AI.
+## GenOS 통합 (차별점)
+- **GenOS 서빙 자동 연결** — 코드스페이스 생성 시 선택한 서빙에 자동 연결(모델/URL/키 주입).
+- **폐쇄망 안전** — 외부 텔레메트리·인증 kill-switch. 모델 호출은 GenOS 서빙 엔드포인트로만.
+- **한국어 UI** — GenOS 환경에 맞춘 현지화.
 
-1. Enter your task and add images to convert mockups into functional apps or fix bugs with screenshots.
-2. CLINE-for-Genos starts by analyzing your file structure & source code ASTs, running regex searches, and reading relevant files to get up to speed in existing projects. By carefully managing what information is added to context, CLINE-for-Genos can provide valuable assistance even for large, complex projects without overwhelming the context window.
-3. Once CLINE-for-Genos has the information he needs, he can:
-    - Create and edit files + monitor linter/compiler errors along the way, letting him proactively fix issues like missing imports and syntax errors on his own.
-    - Execute commands directly in your terminal and monitor their output as he works, letting him e.g., react to dev server issues after editing a file.
-    - For web development tasks, CLINE-for-Genos can launch the site in a headless browser, click, type, scroll, and capture screenshots + console logs, allowing him to fix runtime errors and visual bugs.
-4. When a task is completed, CLINE-for-Genos will present the result to you with a terminal command like `open -a "Google Chrome" index.html`, which you run with a click of a button.
+## 주요 기능
+- **모든 API/모델** — OpenAI 호환 엔드포인트(GenOS 서빙 포함), 로컬 모델(LM Studio/Ollama) 등.
+- **터미널 실행** — 명령 실행·출력 모니터링(승인 기반), 장시간 프로세스 백그라운드 진행.
+- **파일 생성·편집** — diff 뷰로 변경 확인·되돌리기, 린터/컴파일러 오류 자동 대응.
+- **컨텍스트 추가** — `@file` · `@folder` · `@problems` · `@url`.
+- **체크포인트** — 단계별 워크스페이스 스냅샷 비교·복원.
+- **MCP 툴 확장** — "add a tool that…" 로 커스텀 도구 생성·설치.
 
----
+## License / Attribution
 
-<img align="right" width="340" src="https://github.com/user-attachments/assets/3cf21e04-7ce9-4d22-a7b9-ba2c595e88a4">
+Apache License 2.0. 자세한 내용은 [LICENSE.txt](./LICENSE.txt) 참고.
 
-### Use any API and Model
-
-CLINE-for-Genos supports API providers like OpenRouter, Anthropic, OpenAI, Google Gemini, AWS Bedrock, Azure, GCP Vertex, Cerebras and Groq. You can also configure any OpenAI compatible API, or use a local model through LM Studio/Ollama. If you're using OpenRouter, the extension fetches their latest model list, allowing you to use the newest models as soon as they're available.
-
-The extension also keeps track of total tokens and API usage cost for the entire task loop and individual requests, keeping you informed of spend every step of the way.
-
-<!-- Transparent pixel to create line break after floating image -->
-
-<img width="2000" height="0" src="https://github.com/user-attachments/assets/ee14e6f7-20b8-4391-9091-8e8e25561929"><br>
-
-<img align="left" width="370" src="https://github.com/user-attachments/assets/81be79a8-1fdb-4028-9129-5fe055e01e76">
-
-### Run Commands in Terminal
-
-Thanks to the new [shell integration updates in VSCode v1.93](https://code.visualstudio.com/updates/v1_93#_terminal-shell-integration-api), CLINE-for-Genos can execute commands directly in your terminal and receive the output. This allows him to perform a wide range of tasks, from installing packages and running build scripts to deploying applications, managing databases, and executing tests, all while adapting to your dev environment & toolchain to get the job done right.
-
-For long running processes like dev servers, use the "Proceed While Running" button to let CLINE-for-Genos continue in the task while the command runs in the background. As CLINE-for-Genos works he’ll be notified of any new terminal output along the way, letting him react to issues that may come up, such as compile-time errors when editing files.
-
-<!-- Transparent pixel to create line break after floating image -->
-
-<img width="2000" height="0" src="https://github.com/user-attachments/assets/ee14e6f7-20b8-4391-9091-8e8e25561929"><br>
-
-<img align="right" width="400" src="https://github.com/user-attachments/assets/c5977833-d9b8-491e-90f9-05f9cd38c588">
-
-### Create and Edit Files
-
-CLINE-for-Genos can create and edit files directly in your editor, presenting you a diff view of the changes. You can edit or revert CLINE-for-Genos's changes directly in the diff view editor, or provide feedback in chat until you're satisfied with the result. CLINE-for-Genos also monitors linter/compiler errors (missing imports, syntax errors, etc.) so he can fix issues that come up along the way on his own.
-
-All changes made by CLINE-for-Genos are recorded in your file's Timeline, providing an easy way to track and revert modifications if needed.
-
-<!-- Transparent pixel to create line break after floating image -->
-
-<img width="2000" height="0" src="https://github.com/user-attachments/assets/ee14e6f7-20b8-4391-9091-8e8e25561929"><br>
-
-<img align="left" width="370" src="https://github.com/user-attachments/assets/bc2e85ba-dfeb-4fe6-9942-7cfc4703cbe5">
-
-### Use the Browser
-
-With Claude Sonnet's new [Computer Use](https://www.anthropic.com/news/3-5-models-and-computer-use) capability, CLINE-for-Genos can launch a browser, click elements, type text, and scroll, capturing screenshots and console logs at each step. This allows for interactive debugging, end-to-end testing, and even general web use! This gives him autonomy to fixing visual bugs and runtime issues without you needing to handhold and copy-pasting error logs yourself.
-
-Try asking CLINE-for-Genos to "test the app", and watch as he runs a command like `npm run dev`, launches your locally running dev server in a browser, and performs a series of tests to confirm that everything works. [See a demo here.](https://x.com/sdrzn/status/1850880547825823989)
-
-<!-- Transparent pixel to create line break after floating image -->
-
-<img width="2000" height="0" src="https://github.com/user-attachments/assets/ee14e6f7-20b8-4391-9091-8e8e25561929"><br>
-
-<img align="right" width="350" src="https://github.com/user-attachments/assets/ac0efa14-5c1f-4c26-a42d-9d7c56f5fadd">
-
-### "add a tool that..."
-
-Thanks to the [Model Context Protocol](https://github.com/modelcontextprotocol), CLINE-for-Genos can extend his capabilities through custom tools. While you can use [community-made servers](https://github.com/modelcontextprotocol/servers), CLINE-for-Genos can instead create and install tools tailored to your specific workflow. Just ask CLINE-for-Genos to "add a tool" and he will handle everything, from creating a new MCP server to installing it into the extension. These custom tools then become part of CLINE-for-Genos's toolkit, ready to use in future tasks.
-
--   "add a tool that fetches Jira tickets": Retrieve ticket ACs and put CLINE-for-Genos to work
--   "add a tool that manages AWS EC2s": Check server metrics and scale instances up or down
--   "add a tool that pulls the latest PagerDuty incidents": Fetch details and ask CLINE-for-Genos to fix bugs
-
-<!-- Transparent pixel to create line break after floating image -->
-
-<img width="2000" height="0" src="https://github.com/user-attachments/assets/ee14e6f7-20b8-4391-9091-8e8e25561929"><br>
-
-<img align="left" width="360" src="https://github.com/user-attachments/assets/7fdf41e6-281a-4b4b-ac19-020b838b6970">
-
-### Add Context
-
-**`@url`:** Paste in a URL for the extension to fetch and convert to markdown, useful when you want to give CLINE-for-Genos the latest docs
-
-**`@problems`:** Add workspace errors and warnings ('Problems' panel) for CLINE-for-Genos to fix
-
-**`@file`:** Adds a file's contents so you don't have to waste API requests approving read file (+ type to search files)
-
-**`@folder`:** Adds folder's files all at once to speed up your workflow even more
-
-<!-- Transparent pixel to create line break after floating image -->
-
-<img width="2000" height="0" src="https://github.com/user-attachments/assets/ee14e6f7-20b8-4391-9091-8e8e25561929"><br>
-
-<img align="right" width="350" src="https://github.com/user-attachments/assets/140c8606-d3bf-41b9-9a1f-4dbf0d4c90cb">
-
-### Checkpoints: Compare and Restore
-
-As CLINE-for-Genos works through a task, the extension takes a snapshot of your workspace at each step. You can use the 'Compare' button to see a diff between the snapshot and your current workspace, and the 'Restore' button to roll back to that point.
-
-For example, when working with a local web server, you can use 'Restore Workspace Only' to quickly test different versions of your app, then use 'Restore Task and Workspace' when you find the version you want to continue building from. This lets you safely explore different approaches without losing progress.
-
-<!-- Transparent pixel to create line break after floating image -->
-
-<img width="2000" height="0" src="https://github.com/user-attachments/assets/ee14e6f7-20b8-4391-9091-8e8e25561929"><br>
-
-## License
-
-[Apache 2.0 © 2025 CLINE-for-Genos](./LICENSE)
+GenCode 는 [Cline](https://github.com/cline/cline)(© Cline Bot Inc., Apache-2.0)을 기반으로 리브랜딩한 배포판입니다. 원저작권 표기는 LICENSE.txt·[NOTICE](./NOTICE) 에 유지됩니다. "Cline" 은 Cline Bot Inc. 의 상표이며, 여기서는 원본 출처 표기 목적으로만 사용됩니다. 본 제품은 Cline Bot Inc. 와 제휴·보증 관계가 없습니다.

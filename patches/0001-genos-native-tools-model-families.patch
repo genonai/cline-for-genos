@@ -1,0 +1,20 @@
+diff --git a/apps/vscode/src/utils/model-utils.ts b/apps/vscode/src/utils/model-utils.ts
+index b062527..ee15de4 100644
+--- a/apps/vscode/src/utils/model-utils.ts
++++ b/apps/vscode/src/utils/model-utils.ts
+@@ -153,7 +153,14 @@ export function isHermesModelFamily(id: string): boolean {
+ 
+ export function isNextGenOpenSourceModelFamily(id: string): boolean {
+ 	const modelId = normalize(id)
+-	return ["kimi-k2"].some((substring) => modelId.includes(substring))
++	// GenOS soft-fork: the GenOS serving gateway forwards native function/tool calls for
++	// Qwen3 model ids (verified: /v1/chat/completions returns tool_calls). Classify them
++	// next-gen so Cline uses native tool calling instead of XML-style tool calling. These
++	// are reasoning models whose visible `content` is empty under XML mode (all output goes
++	// to reasoning_content), which makes the XML agent loop fail with "no tool used".
++	// NOTE: GLM / Gemma ids are intentionally omitted — the GenOS gateway strips `tools`
++	// for those model ids, so native tool calling would not help there.
++	return ["kimi-k2", "qwen3"].some((substring) => modelId.includes(substring))
+ }
+ 
+ export function isDevstralModelFamily(id: string): boolean {
